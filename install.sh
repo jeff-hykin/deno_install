@@ -9,9 +9,42 @@ has() {
 }
 
 if ! has unzip; then
-	echo "Error: unzip is required to install Deno (see: https://github.com/denoland/deno_install#unzip-is-required )." 1>&2
-	exit 1
+    # if interactive/tty
+    if [ -t 0 ]; then
+        # ask user about auto-install
+        echo "Should I try to install unzip for you? (its required for this to work) ";read ANSWER;echo; 
+        if [ "$ANSWER" =~ ^[Yy] ]; then 
+            base_command=""
+            if has apt-get; then
+                base_command="apt-get install unzip -y"
+            elif has pacman; then
+                base_command="sudo pacman -S unzip"
+            fi
+            
+            # install unzip if needed
+            if [ -n "$base_command" ]
+            then
+                if [ "$(whoami)" = "root" ]; then 
+                    eval $base_command
+                elif has sudo; then 
+                    eval sudo $base_command
+                elif has doas; then 
+                    eval doas $base_command
+                fi
+            fi
+        fi
+    fi
 fi
+# if still doesn't have unzip
+if ! has unzip; then 
+    echo "";
+    echo "Error: unzip is required to install Deno (see: https://github.com/denoland/deno_install#unzip-is-required )." 1>&2
+    echo "I couldn't find an 'unzip' command";
+    echo "And I tried to auto install it, but it seems that failed";
+    echo "(This script needs unzip and either curl or wget)";
+    echo "Please install the unzip command manually then re-run this script";
+    exit 1; 
+fi; 
 
 if [ "$OS" = "Windows_NT" ]; then
 	target="x86_64-pc-windows-msvc"
