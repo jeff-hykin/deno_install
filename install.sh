@@ -3,7 +3,7 @@
 # TODO(everyone): Keep this script simple and easily auditable.
 
 echo
-echo "End Up Stuck? Join our Discord https://discord.gg/deno"
+echo "Stuck? Join our Discord https://discord.gg/deno"
 set -e
 
 if ! command -v unzip >/dev/null && ! command -v 7z >/dev/null; then
